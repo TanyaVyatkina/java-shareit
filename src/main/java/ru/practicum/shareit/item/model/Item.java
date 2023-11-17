@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
@@ -10,7 +11,9 @@ import ru.practicum.shareit.user.User;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Item {
+    @EqualsAndHashCode.Include
     private Integer id;
     private String name;
     private String description;

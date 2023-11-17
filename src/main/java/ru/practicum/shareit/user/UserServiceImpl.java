@@ -2,13 +2,10 @@ package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ConflictEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -34,24 +31,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        validateEmail(userDto.getEmail(), null);
         User user = userRepository.create(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(user);
     }
 
     @Override
     public UserDto updateUser(Integer id, UserDto userDto) {
-        User user = findUserIfExist(id);
-        String userEmail = userDto.getEmail();
-
-        validateEmail(userEmail, id);
-        if (userEmail != null) {
-            user.setEmail(userEmail);
-        }
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        userRepository.update(user);
+        checkUserExists(id);
+        userDto.setId(id);
+        User user = userRepository.update(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(user);
     }
 
@@ -60,20 +48,8 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    private User findUserIfExist(Integer id) {
-        return userRepository.findById(id)
+    private void checkUserExists(Integer id) {
+        userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-    }
-
-    private void validateEmail(String email, Integer userId) {
-        if (email == null) return;
-        if (email.isBlank() || !email.contains("@")) {
-            throw new ValidationException("Некорректный email.");
-        }
-        Optional<User> savedUser = userRepository.getUserByEmail(email);
-        if (userId == null && savedUser.isPresent()
-                || userId != null && savedUser.isPresent() && !userId.equals(savedUser.get().getId())) {
-            throw new ConflictEmailException("Указанный email уже существует.");
-        }
     }
 }

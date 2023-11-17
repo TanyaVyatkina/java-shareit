@@ -10,12 +10,20 @@ import java.util.stream.Collectors;
 public class ItemRepositoryImpl implements ItemRepository {
     private int itemId = 0;
     private Map<Integer, Item> items = new HashMap<>();
+    private Map<Integer, Set<Item>> itemsByOwner = new HashMap<>();
+
 
     @Override
     public Item add(Item item) {
         int newId = getItemId();
+        int ownerId = item.getOwner().getId();
+
         item.setId(newId);
         items.put(newId, item);
+        if (itemsByOwner.get(ownerId) == null) {
+            itemsByOwner.put(ownerId, new HashSet<>());
+        }
+        itemsByOwner.get(ownerId).add(item);
         return item;
     }
 
@@ -27,14 +35,13 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public void update(Item item) {
         items.put(item.getId(), item);
+        itemsByOwner.get(item.getOwner().getId()).remove(item);
+        itemsByOwner.get(item.getOwner().getId()).add(item);
     }
 
     @Override
-    public List<Item> getItemsByUserId(int userId) {
-        return items.values()
-                .stream()
-                .filter(i -> i.getOwner().getId().equals(userId))
-                .collect(Collectors.toList());
+    public List<Item> findByOwnerId(int ownerId) {
+        return new ArrayList<>(itemsByOwner.get(ownerId));
     }
 
     @Override
@@ -42,7 +49,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         if (text.isBlank()) return new ArrayList<>();
         return items.values()
                 .stream()
-                .filter(i -> isItemAvailiable(i, text))
+                .filter(i -> isMatch(i, text))
                 .collect(Collectors.toList());
     }
 
@@ -50,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return ++itemId;
     }
 
-    private boolean isItemAvailiable(Item item, String text) {
+    private boolean isMatch(Item item, String text) {
         return Boolean.TRUE.equals(item.getAvailable())
                 && (item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text));
     }

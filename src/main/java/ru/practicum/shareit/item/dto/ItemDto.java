@@ -3,6 +3,9 @@ package ru.practicum.shareit.item.dto;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.validator.CustomNotEmpty;
+import ru.practicum.shareit.validator.OnCreate;
+import ru.practicum.shareit.validator.OnUpdate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,11 +18,13 @@ import javax.validation.constraints.NotNull;
 public class
 ItemDto {
     private Integer id;
-    @NotBlank
+    @NotBlank(groups = OnCreate.class, message = "Имя должно быть заполнено.")
+    @CustomNotEmpty(groups = OnUpdate.class, message = "Имя должно быть заполнено.")
     private String name;
-    @NotBlank
+    @NotBlank(groups = OnCreate.class, message = "Описание должно быть заполнено.")
+    @CustomNotEmpty(groups = OnUpdate.class, message = "Описание должно быть заполнено.")
     private String description;
-    @NotNull
+    @NotNull(groups = OnCreate.class)
     private Boolean available;
     private ItemRequest request;
 

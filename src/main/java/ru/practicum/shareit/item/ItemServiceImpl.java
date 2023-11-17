@@ -60,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getUserItems(int userId) {
         findUserIfExists(userId);
-        List<Item> foundItems = itemRepository.getItemsByUserId(userId);
+        List<Item> foundItems = itemRepository.findByOwnerId(userId);
         return ItemMapper.toItemDtoList(foundItems);
     }
 

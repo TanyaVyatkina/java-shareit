@@ -12,7 +12,7 @@ public interface ItemRepository {
 
     void update(Item item);
 
-    List<Item> getItemsByUserId(int userId);
+    List<Item> findByOwnerId(int ownerId);
 
     List<Item> search(String text);
 }

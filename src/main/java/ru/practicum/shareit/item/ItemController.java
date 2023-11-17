@@ -2,10 +2,12 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.validator.OnCreate;
+import ru.practicum.shareit.validator.OnUpdate;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/items")
+@Validated
 @Slf4j
 public class ItemController {
     private ItemService itemService;
@@ -23,7 +26,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") int userId, @Valid @RequestBody ItemDto item) {
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") int userId, @RequestBody @Validated({OnCreate.class}) ItemDto item) {
         log.debug("Добавление вещи {} пользователя с id = {}.", item.getName(), userId);
         ItemDto savedItem = itemService.addItem(userId, item);
         log.debug("Вещь добавлена.");
@@ -32,7 +35,7 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable("itemId") Integer itemId,
-                              @RequestBody ItemDto item) {
+                              @RequestBody @Validated({OnUpdate.class}) ItemDto item) {
         log.debug("Обновление вещи id = {} пользователя c id = {}.", itemId, userId);
         ItemDto updatedItem = itemService.updateItem(userId, itemId, item);
         log.debug("Данные обновлены.");
