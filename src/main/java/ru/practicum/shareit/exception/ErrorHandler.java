@@ -38,7 +38,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictEmailException(final ConflictEmailException e) {
+    public ErrorResponse handleConflictEmailException(final ConflictException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
     }

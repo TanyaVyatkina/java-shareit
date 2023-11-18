@@ -34,9 +34,10 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public void update(Item item) {
-        items.put(item.getId(), item);
-        itemsByOwner.get(item.getOwner().getId()).remove(item);
-        itemsByOwner.get(item.getOwner().getId()).add(item);
+        Item updatedItem = items.put(item.getId(), item);
+        Set<Item> allOwnerItems = itemsByOwner.get(item.getOwner().getId());
+        allOwnerItems.remove(updatedItem);
+        allOwnerItems.add(updatedItem);
     }
 
     @Override
