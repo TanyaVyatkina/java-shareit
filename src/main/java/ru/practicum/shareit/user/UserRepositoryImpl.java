@@ -6,8 +6,8 @@ import ru.practicum.shareit.exception.ConflictException;
 import java.util.*;
 
 @Component
-public class UserRepositoryImpl implements UserRepository {
-    private Map<Integer, User> usersById = new HashMap<>();
+public class UserRepositoryImpl {
+   /* private Map<Integer, User> usersById = new HashMap<>();
     private Map<String, User> usersByEmail = new HashMap<>();
     private int userId = 0;
 
@@ -68,5 +68,5 @@ public class UserRepositoryImpl implements UserRepository {
 
     private int getUserId() {
         return ++userId;
-    }
+    }*/
 }

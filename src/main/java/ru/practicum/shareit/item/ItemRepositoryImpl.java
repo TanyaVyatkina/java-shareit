@@ -7,13 +7,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class ItemRepositoryImpl implements ItemRepository {
+public class ItemRepositoryImpl {
     private int itemId = 0;
     private Map<Integer, Item> items = new HashMap<>();
     private Map<Integer, Set<Item>> itemsByOwner = new HashMap<>();
 
 
-    @Override
+ /*   @Override
     public Item add(Item item) {
         int newId = getItemId();
         int ownerId = item.getOwner().getId();
@@ -62,5 +62,5 @@ public class ItemRepositoryImpl implements ItemRepository {
         return Boolean.TRUE.equals(item.getAvailable())
                 && (item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text));
     }
-
+*/
 }

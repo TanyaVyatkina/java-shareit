@@ -42,5 +42,12 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleForbiddenException(final ForbiddenException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
+    }
 }
 

@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto findById(@PathVariable("id") Integer id) {
+    public UserDto findById(@PathVariable("id") Long id) {
         log.debug("Поиск пользователя с id = {}.", id);
         UserDto user = userService.findUserById(id);
         log.debug("Найден пользователь {}.", id);
@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable("id") Integer id, @RequestBody @Validated({OnUpdate.class}) UserDto user) {
+    public UserDto update(@PathVariable("id") Long id, @RequestBody @Validated({OnUpdate.class}) UserDto user) {
         log.debug("Пришел запрос на обновление пользователя.");
         UserDto updatedUser = userService.updateUser(id, user);
         log.debug("Обновлен пользователь с id = {}", user.getId());
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable("id") Integer id) {
+    public void deleteById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
         log.debug("Пользователь с id = {} удалён", id);
     }

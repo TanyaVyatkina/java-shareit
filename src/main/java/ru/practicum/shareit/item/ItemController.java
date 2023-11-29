@@ -26,7 +26,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") int userId, @RequestBody @Validated({OnCreate.class}) ItemDto item) {
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody @Validated({OnCreate.class}) ItemDto item) {
         log.debug("Добавление вещи {} пользователя с id = {}.", item.getName(), userId);
         ItemDto savedItem = itemService.addItem(userId, item);
         log.debug("Вещь добавлена.");
@@ -34,7 +34,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable("itemId") Integer itemId,
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable("itemId") long itemId,
                               @RequestBody @Validated({OnUpdate.class}) ItemDto item) {
         log.debug("Обновление вещи id = {} пользователя c id = {}.", itemId, userId);
         ItemDto updatedItem = itemService.updateItem(userId, itemId, item);
@@ -43,7 +43,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable("itemId") Integer itemId) {
+    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable("itemId") long itemId) {
         log.debug("Поиск вещи id = {} пользователя c id = {}.", itemId, userId);
         ItemDto foundItem = itemService.getItem(userId, itemId);
         log.debug("Найдена вещь: {}.", foundItem);
@@ -51,7 +51,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
         log.debug("Поиск всех вещей пользователя id = {}.", userId);
         List<ItemDto> foundItems = itemService.getUserItems(userId);
         log.debug("Найдены вещи: {}.", foundItems);
@@ -59,7 +59,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
+    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") long userId, @RequestParam String text) {
         log.debug("Поиск вещей по запросу {}.", text);
         List<ItemDto> foundItems = itemService.searchItems(userId, text);
         log.debug("Найдены вещи: {}.", foundItems);
