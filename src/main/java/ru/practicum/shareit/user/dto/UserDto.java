@@ -13,8 +13,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @AllArgsConstructor
-public class
-UserDto {
+public class UserDto {
     private Long id;
     @NotBlank(groups = OnCreate.class, message = "Имя должно быть заполнено.")
     @CustomNotEmpty(groups = OnUpdate.class, message = "Имя должно быть заполнено.")

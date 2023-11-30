@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.validator.OnCreate;
 import ru.practicum.shareit.validator.OnUpdate;
 
+import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -64,5 +67,15 @@ public class ItemController {
         List<ItemDto> foundItems = itemService.searchItems(userId, text);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable("itemId") long itemId,
+                                 @RequestBody @Valid CommentDto commentDto) {
+        log.debug("Запрос на добавление комментария от пользователя id = {}, к вещи id = {}.", userId, itemId);
+        commentDto.setCreated(LocalDateTime.now());
+        CommentDto comment = itemService.addComment(userId, itemId, commentDto);
+        log.debug("Комментарий добавлен.");
+        return comment;
     }
 }

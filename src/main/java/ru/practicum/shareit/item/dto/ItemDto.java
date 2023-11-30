@@ -2,14 +2,14 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.validator.CustomNotEmpty;
 import ru.practicum.shareit.validator.OnCreate;
 import ru.practicum.shareit.validator.OnUpdate;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -27,13 +27,17 @@ ItemDto {
     private String description;
     @NotNull(groups = OnCreate.class)
     private Boolean available;
-    private Integer ownerId;
-   // private ItemRequest request;
+    private Long ownerId;
+    private BookingShortDto lastBooking;
+    private BookingShortDto nextBooking;
+    private List<CommentDto> comments;
+    // private ItemRequest request;
 
-    public ItemDto(Long id, String name, String description, Boolean available) {
+    public ItemDto(Long id, String name, String description, Boolean available, Long ownerId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
+        this.ownerId = ownerId;
     }
 }

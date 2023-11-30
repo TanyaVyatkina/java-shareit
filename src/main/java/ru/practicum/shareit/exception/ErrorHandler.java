@@ -44,7 +44,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleForbiddenException(final ForbiddenException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());

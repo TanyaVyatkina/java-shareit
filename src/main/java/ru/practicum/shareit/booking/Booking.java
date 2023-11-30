@@ -13,16 +13,16 @@ import java.time.LocalDateTime;
  * TODO Sprint add-bookings.
  */
 @Entity
-@Table(name="bookings")
+@Table(name = "bookings")
 @Getter
 @Setter
 public class Booking {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name="start_date")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "start_date")
     private LocalDateTime start;
-    @Column(name="end_date")
+    @Column(name = "end_date")
     private LocalDateTime end;
     @ManyToOne(fetch = FetchType.LAZY)
     private Item item;
