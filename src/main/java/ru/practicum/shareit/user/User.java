@@ -11,7 +11,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "users")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class User {
     @Id
@@ -19,6 +20,7 @@ public class User {
     private Long id;
     private String name;
     private String email;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
