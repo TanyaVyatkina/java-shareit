@@ -65,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto getBooking(Long userId, long bookingId) {
+    public BookingDto getBooking(long userId, long bookingId) {
         findUserIfExists(userId);
         Booking booking = findBookingIfExists(bookingId);
         if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
