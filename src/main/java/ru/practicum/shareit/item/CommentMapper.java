@@ -14,6 +14,7 @@ public class CommentMapper {
     }
 
     public static List<CommentDto> toCommentDtoList(List<Comment> comments) {
+        if (comments == null) return null;
         return comments
                 .stream()
                 .map(CommentMapper::toCommentDto)

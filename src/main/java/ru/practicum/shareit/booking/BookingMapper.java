@@ -27,6 +27,7 @@ public class BookingMapper {
     }
 
     public static List<BookingDto> toBookingDtoList(List<Booking> bookings) {
+        if (bookings == null) return null;
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDto)

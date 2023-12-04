@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByOwner_Id(long userId);
@@ -15,4 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "or lower(it.description) like lower(concat('%', ?1,'%')))")
     List<Item> findItemsByText(String text);
 
+    Optional<Item> findByIdAndOwner_IdIsNot(long itemId, long userId);
+
+    Optional<Item> findByIdAndOwner_Id(long itemId, long userId);
 }

@@ -1,26 +1,55 @@
 package ru.practicum.shareit.item;
 
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemForBookingDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
-        return new ItemDto(item.getId(), item.getName(), item.getDescription(),
+    public static ItemShortDto toItemShortDto(Item item) {
+        return new ItemShortDto(item.getId(), item.getName(), item.getDescription(),
                 item.getAvailable(), item.getOwner().getId());
     }
 
-    public static List<ItemDto> toItemDtoList(List<Item> items) {
+    public static ItemDto toItemDto(Item item, List<CommentDto> comments, List<Booking> bookingsForItem) {
+        ItemDto dto = new ItemDto(item.getId(), item.getName(), item.getDescription(),
+                item.getAvailable(), item.getOwner().getId(), comments);
+        if (bookingsForItem == null) {
+            return dto;
+        }
+        Booking nextBooking = bookingsForItem
+                .stream()
+                .filter(b -> b.getStart().isAfter(LocalDateTime.now()) && !BookingStatus.REJECTED.equals(b.getStatus()))
+                .sorted((b1, b2) -> b1.getStart().compareTo(b2.getStart()))
+                .findFirst()
+                .orElse(null);
+        Booking lastBooking = bookingsForItem
+                .stream()
+                .filter(b -> b.getStart().isBefore(LocalDateTime.now()) && !BookingStatus.REJECTED.equals(b.getStatus()))
+                .sorted((b1, b2) -> b2.getStart().compareTo(b1.getStart()))
+                .findFirst()
+                .orElse(null);
+        dto.setLastBooking(lastBooking != null ? BookingMapper.toBookingShortDto(lastBooking) : null);
+        dto.setNextBooking(nextBooking != null ? BookingMapper.toBookingShortDto(nextBooking) : null);
+        return dto;
+    }
+
+    public static List<ItemShortDto> toItemShortDtoList(List<Item> items) {
         return items.stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toItemShortDto)
                 .collect(Collectors.toList());
     }
 
-    public static Item toItem(ItemDto itemDto, User owner) {
+    public static Item toItem(ItemShortDto itemDto, User owner) {
         Item item = new Item();
         item.setOwner(owner);
         item.setName(itemDto.getName());

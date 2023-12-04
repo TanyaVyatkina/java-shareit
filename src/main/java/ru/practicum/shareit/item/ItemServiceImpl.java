@@ -3,13 +3,12 @@ package ru.practicum.shareit.item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
@@ -17,7 +16,10 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -37,21 +39,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto addItem(long userId, ItemDto itemDto) {
+    public ItemShortDto addItem(long userId, ItemShortDto itemDto) {
         User user = findUserIfExists(userId);
         Item item = ItemMapper.toItem(itemDto, user);
         item.setOwner(user);
         item = itemRepository.save(item);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemShortDto(item);
     }
 
     @Override
-    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
-        User user = findUserIfExists(userId);
-        Item item = findItemIfExists(itemId);
-        if (!item.getOwner().getId().equals(user.getId())) {
-            throw new NotFoundException("Данная вещь для указанного пользователя не найдена.");
-        }
+    public ItemShortDto updateItem(long userId, long itemId, ItemShortDto itemDto) {
+        findUserIfExists(userId);
+        Item item = itemRepository.findByIdAndOwner_Id(itemId, userId)
+                .orElseThrow(() -> new NotFoundException("Данная вещь для указанного пользователя не найдена."));
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());
         }
@@ -62,38 +62,63 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
         itemRepository.save(item);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemShortDto(item);
     }
 
     @Override
     public ItemDto getItem(long userId, long itemId) {
         findUserIfExists(userId);
         Item item = findItemIfExists(itemId);
+        List<Comment> comments = commentRepository.findByItem_Id(item.getId());
         if (item.getOwner().getId().equals(userId)) {
-            return createItemDtoWithBookings(item);
+            List<Booking> bookingsForItem = bookingRepository.findByItem_Id(item.getId());
+            return ItemMapper.toItemDto(item, CommentMapper.toCommentDtoList(comments), bookingsForItem);
         }
-        return createItemDtoWithoutBookings(item);
+        return ItemMapper.toItemDto(item, CommentMapper.toCommentDtoList(comments), null);
     }
 
     @Override
     public List<ItemDto> getUserItems(long userId) {
         findUserIfExists(userId);
         List<Item> foundItems = itemRepository.findByOwner_Id(userId);
-        List<ItemDto> foundItemsDto = new ArrayList<>();
+        List<Long> itemIds = foundItems.stream()
+                .map(i -> i.getId())
+                .collect(Collectors.toList());
 
+        List<Comment> comments = commentRepository.findByItem_IdIn(itemIds);
+        Map<Long, List<Comment>> commentsMap = new HashMap<>();
+        for (Comment comment : comments) {
+            Long itemId = comment.getItem().getId();
+            if (commentsMap.get(itemId) == null) {
+                commentsMap.put(itemId, new ArrayList<>());
+            }
+            commentsMap.get(itemId).add(comment);
+        }
+        List<Booking> bookings = bookingRepository.findByItem_IdIn(itemIds);
+        Map<Long, List<Booking>> bookingsMap = new HashMap<>();
+        for (Booking booking : bookings) {
+            Long itemId = booking.getItem().getId();
+            if (bookingsMap.get(itemId) == null) {
+                bookingsMap.put(itemId, new ArrayList<>());
+            }
+            bookingsMap.get(itemId).add(booking);
+        }
+
+        List<ItemDto> foundItemsDto = new ArrayList<>();
         for (Item item : foundItems) {
-            ItemDto dto = createItemDtoWithBookings(item);
-            foundItemsDto.add(dto);
+            List<Comment> itemComments = commentsMap.get(item.getId());
+            List<Booking> itemBookings = bookingsMap.get(item.getId());
+            foundItemsDto.add(ItemMapper.toItemDto(item, CommentMapper.toCommentDtoList(itemComments), itemBookings));
         }
         return foundItemsDto;
     }
 
     @Override
-    public List<ItemDto> searchItems(long userId, String text) {
+    public List<ItemShortDto> searchItems(long userId, String text) {
         findUserIfExists(userId);
         if (text.isBlank()) return new ArrayList<>();
         List<Item> foundItems = itemRepository.findItemsByText(text);
-        return ItemMapper.toItemDtoList(foundItems);
+        return ItemMapper.toItemShortDtoList(foundItems);
     }
 
     @Override
@@ -118,32 +143,5 @@ public class ItemServiceImpl implements ItemService {
     private Item findItemIfExists(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id = " + itemId + " не найденa."));
-    }
-
-    private ItemDto createItemDtoWithoutBookings(Item item) {
-        ItemDto dto = ItemMapper.toItemDto(item);
-        List<Comment> comments = commentRepository.findByItem_Id(item.getId());
-        dto.setComments(CommentMapper.toCommentDtoList(comments));
-        return dto;
-    }
-
-    private ItemDto createItemDtoWithBookings(Item item) {
-        ItemDto dto = createItemDtoWithoutBookings(item);
-        List<Booking> bookingsForItem = bookingRepository.findByItem_Id(item.getId());
-        Booking nextBooking = bookingsForItem
-                .stream()
-                .filter(b -> b.getStart().isAfter(LocalDateTime.now()) && !BookingStatus.REJECTED.equals(b.getStatus()))
-                .sorted((b1, b2) -> b1.getStart().compareTo(b2.getStart()))
-                .findFirst()
-                .orElse(null);
-        Booking lastBooking = bookingsForItem
-                .stream()
-                .filter(b -> b.getStart().isBefore(LocalDateTime.now()) && !BookingStatus.REJECTED.equals(b.getStatus()))
-                .sorted((b1, b2) -> b2.getStart().compareTo(b1.getStart()))
-                .findFirst()
-                .orElse(null);
-        dto.setLastBooking(lastBooking != null ? BookingMapper.toBookingShortDto(lastBooking) : null);
-        dto.setNextBooking(nextBooking != null ? BookingMapper.toBookingShortDto(nextBooking) : null);
-        return dto;
     }
 }

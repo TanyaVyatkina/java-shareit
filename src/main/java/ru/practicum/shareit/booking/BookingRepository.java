@@ -1,33 +1,51 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByBooker_IdAndStartAfterOrderByIdDesc(long userId, LocalDateTime date);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "item")
+    List<Booking> findByBooker_IdAndStartAfter(long userId, LocalDateTime date, Sort sort);
 
-    List<Booking> findByBooker_IdAndEndBeforeOrderByIdDesc(long userId, LocalDateTime date);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "item")
+    List<Booking> findByBooker_IdAndEndBefore(long userId, LocalDateTime date, Sort sort);
 
-    List<Booking> findByBooker_IdAndStartBeforeAndEndAfterOrderByIdAsc(long userId, LocalDateTime start, LocalDateTime end);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "item")
+    List<Booking> findByBooker_IdAndStartBeforeAndEndAfter(long userId, LocalDateTime start,
+                                                           LocalDateTime end, Sort sort);
 
-    List<Booking> findByBooker_IdAndStatusOrderByIdDesc(long userId, BookingStatus bookingStatus);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "item")
+    List<Booking> findByBooker_IdAndStatus(long userId, BookingStatus bookingStatus, Sort sort);
 
-    List<Booking> findByBooker_IdOrderByIdDesc(long userId);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "item")
+    List<Booking> findByBooker_Id(long userId, Sort sort);
 
-    List<Booking> findByItem_IdInOrderByIdDesc(List<Long> itemIds);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdIn(List<Long> itemIds, Sort sort);
 
-    List<Booking> findByItem_IdInAndStatusOrderByIdDesc(List<Long> itemIds, BookingStatus bookingStatus);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdInAndStatus(List<Long> itemIds, BookingStatus bookingStatus, Sort sort);
 
-    List<Booking> findByItem_IdInAndStartAfterOrderByIdDesc(List<Long> itemIds, LocalDateTime date);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdInAndStartAfter(List<Long> itemIds, LocalDateTime date, Sort sort);
 
-    List<Booking> findByItem_IdInAndEndBeforeOrderByIdDesc(List<Long> itemIds, LocalDateTime date);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdInAndEndBefore(List<Long> itemIds, LocalDateTime date, Sort sort);
 
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
     List<Booking> findByItem_Id(Long itemId);
+
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdIn(List<Long> itemIds);
 
     List<Booking> findByItem_IdAndBooker_IdAndEndBefore(Long itemId, Long bookerId, LocalDateTime time);
 
-    List<Booking> findByItem_IdInAndStartBeforeAndEndAfterOrderByIdDesc(List<Long> itemIds, LocalDateTime start, LocalDateTime end);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "booker")
+    List<Booking> findByItem_IdInAndStartBeforeAndEndAfter(List<Long> itemIds, LocalDateTime start,
+                                                           LocalDateTime end, Sort sort);
 
 }

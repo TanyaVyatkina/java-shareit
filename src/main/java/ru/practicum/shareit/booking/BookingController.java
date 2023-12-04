@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
@@ -28,6 +26,9 @@ public class BookingController {
                                  @RequestBody @Valid BookingRequestDto bookingDto) {
         log.debug("Пришел новый запрос на бронирование вещи с id = {} от пользователя {}.",
                 bookingDto.getItemId(), userId);
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
+            throw new ValidationException("Неправильные даты бронирования.");
+        }
         bookingDto.setStatus(BookingStatus.WAITING);
         BookingDto savedBooking = bookingService.addBooking(userId, bookingDto);
         log.debug("Бронирование добавлено.");
@@ -58,12 +59,7 @@ public class BookingController {
     public List<BookingDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") int userId,
                                             @RequestParam(defaultValue = "ALL") String state) {
         log.debug("Получение списка всех бронирований пользователя (id = {}).", userId);
-        BookingState stateEnum;
-        try {
-            stateEnum = BookingState.valueOf(state);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException("Unknown state: " + state);
-        }
+        BookingState stateEnum = BookingState.toEnum(state);
         List<BookingDto> foundBookings = bookingService.getUserBookings(userId, stateEnum);
         log.debug("Найдены бронирования: {}.", foundBookings);
         BookingState.ALL.name();
