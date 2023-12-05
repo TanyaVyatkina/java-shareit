@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,18 +7,21 @@ import ru.practicum.shareit.validator.CustomNotEmpty;
 import ru.practicum.shareit.validator.OnCreate;
 import ru.practicum.shareit.validator.OnUpdate;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserDto {
+public class ItemShortDto {
     private Long id;
     @NotBlank(groups = OnCreate.class, message = "Имя должно быть заполнено.")
     @CustomNotEmpty(groups = OnUpdate.class, message = "Имя должно быть заполнено.")
     private String name;
-    @Email(groups = {OnCreate.class, OnUpdate.class}, message = "Некорректный email.")
-    @NotBlank(groups = OnCreate.class, message = "Некорректный email.")
-    private String email;
+    @NotBlank(groups = OnCreate.class, message = "Описание должно быть заполнено.")
+    @CustomNotEmpty(groups = OnUpdate.class, message = "Описание должно быть заполнено.")
+    private String description;
+    @NotNull(groups = OnCreate.class)
+    private Boolean available;
+    private Long ownerId;
 }
