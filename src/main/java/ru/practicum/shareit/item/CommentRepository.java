@@ -7,10 +7,10 @@ import ru.practicum.shareit.item.model.Comment;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "author")
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, value = "comment_entity-graph")
     List<Comment> findByItem_Id(Long itemId);
 
-    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "author")
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, value = "comment_entity-graph")
     List<Comment> findByItem_IdIn(List<Long> itemIds);
 
 }

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
+@NamedEntityGraph(name = "comment_entity-graph", attributeNodes = @NamedAttributeNode("author"))
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

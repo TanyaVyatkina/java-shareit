@@ -16,6 +16,10 @@ import java.time.LocalDateTime;
 @Table(name = "bookings")
 @Getter
 @Setter
+@NamedEntityGraph(name = "booking_entity-graph", attributeNodes = {
+        @NamedAttributeNode("item"),
+        @NamedAttributeNode("booker")
+})
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

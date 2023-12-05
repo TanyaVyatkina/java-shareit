@@ -16,10 +16,10 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -83,31 +83,21 @@ public class ItemServiceImpl implements ItemService {
         List<Item> foundItems = itemRepository.findByOwner_Id(userId);
         List<Long> itemIds = foundItems.stream()
                 .map(i -> i.getId())
-                .collect(Collectors.toList());
+                .collect(toList());
 
         List<Comment> comments = commentRepository.findByItem_IdIn(itemIds);
-        Map<Long, List<Comment>> commentsMap = new HashMap<>();
-        for (Comment comment : comments) {
-            Long itemId = comment.getItem().getId();
-            if (commentsMap.get(itemId) == null) {
-                commentsMap.put(itemId, new ArrayList<>());
-            }
-            commentsMap.get(itemId).add(comment);
-        }
+        Map<Item, List<Comment>> commentsMap = comments
+                .stream()
+                .collect(groupingBy(Comment::getItem, toList()));
         List<Booking> bookings = bookingRepository.findByItem_IdIn(itemIds);
-        Map<Long, List<Booking>> bookingsMap = new HashMap<>();
-        for (Booking booking : bookings) {
-            Long itemId = booking.getItem().getId();
-            if (bookingsMap.get(itemId) == null) {
-                bookingsMap.put(itemId, new ArrayList<>());
-            }
-            bookingsMap.get(itemId).add(booking);
-        }
+        Map<Item, List<Booking>> bookingsMap = bookings
+                .stream()
+                .collect(groupingBy(Booking::getItem, toList()));
 
         List<ItemDto> foundItemsDto = new ArrayList<>();
         for (Item item : foundItems) {
-            List<Comment> itemComments = commentsMap.get(item.getId());
-            List<Booking> itemBookings = bookingsMap.get(item.getId());
+            List<Comment> itemComments = commentsMap.get(item);
+            List<Booking> itemBookings = bookingsMap.get(item);
             foundItemsDto.add(ItemMapper.toItemDto(item, CommentMapper.toCommentDtoList(itemComments), itemBookings));
         }
         return foundItemsDto;
