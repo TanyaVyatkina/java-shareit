@@ -22,6 +22,7 @@ public class UserServiceImplIntegrationTest {
     private UserRepository userRepository;
 
     private User user;
+
     @BeforeEach
     void saveUsers() {
         user = new User();
@@ -30,6 +31,7 @@ public class UserServiceImplIntegrationTest {
         user.setEmail("email@email.com");
         userRepository.save(user);
     }
+
     @Test
     void testFindAllUsers() {
         List<UserDto> resultUsers = userService.findAllUsers();

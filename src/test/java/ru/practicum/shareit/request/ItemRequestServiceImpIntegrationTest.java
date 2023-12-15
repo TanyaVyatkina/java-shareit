@@ -42,6 +42,7 @@ public class ItemRequestServiceImpIntegrationTest {
         itemRequest.setCreated(LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
     }
+
     @Test
     void testGetUserItemRequests() {
         List<ItemRequestDto> resultRequests = itemRequestService.getUserItemRequests(user.getId());

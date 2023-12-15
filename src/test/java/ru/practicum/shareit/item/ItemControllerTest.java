@@ -72,6 +72,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.ownerId", is(itemShortDto.getOwnerId()), Long.class))
                 .andExpect(jsonPath("$.requestId", is(itemShortDto.getRequestId()), Long.class));
     }
+
     @Test
     public void getItem() throws Exception {
         ItemDto itemDto = createItemDto();
@@ -123,7 +124,7 @@ public class ItemControllerTest {
 
     @Test
     public void addComment() throws Exception {
-        CommentDto commentDto = new CommentDto(11L, "Играет как по нотам","Валера",
+        CommentDto commentDto = new CommentDto(11L, "Играет как по нотам", "Валера",
                 LocalDateTime.now());
         when(itemService.addComment(anyLong(), anyLong(), any()))
                 .thenReturn(commentDto);
