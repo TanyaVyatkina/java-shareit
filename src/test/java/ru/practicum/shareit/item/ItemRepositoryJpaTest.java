@@ -26,6 +26,8 @@ public class ItemRepositoryJpaTest {
     private ItemRepository itemRepository;
     private Item item;
     private User owner;
+    PageRequest page = PageRequest.of(0, 1);
+
 
     @BeforeEach
     void saveData() {
@@ -45,7 +47,6 @@ public class ItemRepositoryJpaTest {
 
     @Test
     void testFindItemsByTextByName() {
-        PageRequest page = PageRequest.of(0, 1);
         List<Item> resultItems = itemRepository.findItemsByText("лыжи", page);
 
         assertEquals(resultItems.size(), 1);
@@ -58,7 +59,6 @@ public class ItemRepositoryJpaTest {
 
     @Test
     void testFindItemsByTextByDescription() {
-        PageRequest page = PageRequest.of(0, 1);
         List<Item> resultItems = itemRepository.findItemsByText("длин", page);
 
         assertEquals(resultItems.size(), 1);
@@ -71,7 +71,6 @@ public class ItemRepositoryJpaTest {
 
     @Test
     void testFindItemsByTextWithNoFound() {
-        PageRequest page = PageRequest.of(0, 1);
         List<Item> resultItems = itemRepository.findItemsByText("дрель", page);
 
         assertEquals(resultItems.size(), 0);
@@ -80,18 +79,21 @@ public class ItemRepositoryJpaTest {
     @Test
     void testFindByOwner_Id() {
         List<Item> resultItems = itemRepository.findByOwner_Id(owner.getId());
+
         assertEquals(1, resultItems.size());
     }
 
     @Test
     void testFindByIdAndOwner_IdIsNot() {
         Optional<Item> result = itemRepository.findByIdAndOwner_IdIsNot(item.getId(), owner.getId() + 1);
+
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindByIdAndOwner_Id() {
         Optional<Item> result = itemRepository.findByIdAndOwner_Id(item.getId(), owner.getId());
+
         assertTrue(result.isPresent());
     }
 

@@ -127,6 +127,84 @@ public class BookingRepositoryJpaTest {
         assertEquals(1, resultBookings.size());
     }
 
+    @Test
+    void testFindByItem_Id() {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.WAITING);
+        booking.setStart(LocalDateTime.now().plusDays(3));
+        booking.setEnd(LocalDateTime.now().plusDays(4));
+        em.persist(booking);
+        em.flush();
+
+        List<Booking> resultBookings = bookingRepository.findByItem_Id(item.getId());
+        assertEquals(1, resultBookings.size());
+    }
+
+    @Test
+    void testFindByItem_IdInAndEndBefore() {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.WAITING);
+        booking.setStart(LocalDateTime.now().minusDays(5));
+        booking.setEnd(LocalDateTime.now().minusDays(4));
+        em.persist(booking);
+        em.flush();
+
+        List<Booking> resultBookings = bookingRepository.findByItem_IdInAndEndBefore(List.of(item.getId()),
+                LocalDateTime.now(), page);
+        assertEquals(1, resultBookings.size());
+    }
+
+    @Test
+    void testFindByItem_IdInAndStartAfter() {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.WAITING);
+        booking.setStart(LocalDateTime.now().plusDays(2));
+        booking.setEnd(LocalDateTime.now().plusDays(4));
+        em.persist(booking);
+        em.flush();
+
+        List<Booking> resultBookings = bookingRepository.findByItem_IdInAndStartAfter(List.of(item.getId()),
+                LocalDateTime.now(), page);
+        assertEquals(1, resultBookings.size());
+    }
+
+    @Test
+    void testFindByItem_IdInAndStatus() {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.WAITING);
+        booking.setStart(LocalDateTime.now().plusDays(2));
+        booking.setEnd(LocalDateTime.now().plusDays(4));
+        em.persist(booking);
+        em.flush();
+
+        List<Booking> resultBookings = bookingRepository.findByItem_IdInAndStatus(List.of(item.getId()),
+                BookingStatus.WAITING, page);
+        assertEquals(1, resultBookings.size());
+    }
+
+    @Test
+    void testFindByItem_IdIn() {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.WAITING);
+        booking.setStart(LocalDateTime.now().plusDays(2));
+        booking.setEnd(LocalDateTime.now().plusDays(4));
+        em.persist(booking);
+        em.flush();
+
+        List<Booking> resultBookings = bookingRepository.findByItem_IdIn(List.of(item.getId()), page);
+        assertEquals(1, resultBookings.size());
+    }
+
     @AfterEach
     void deleteData() {
         bookingRepository.deleteAll();
