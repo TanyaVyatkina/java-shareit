@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -11,6 +12,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -28,20 +32,29 @@ public class ItemServiceImpl implements ItemService {
     private BookingRepository bookingRepository;
     private CommentRepository commentRepository;
 
+    private ItemRequestRepository itemRequestRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
-                           BookingRepository bookingRepository, CommentRepository commentRepository) {
+                           BookingRepository bookingRepository, CommentRepository commentRepository,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
     public ItemShortDto addItem(long userId, ItemShortDto itemDto) {
         User user = findUserIfExists(userId);
-        Item item = ItemMapper.toItem(itemDto, user);
+        Long requestId = itemDto.getRequestId();
+        ItemRequest itemRequest = null;
+        if (requestId != null) {
+            itemRequest = itemRequestRepository.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("Запрос с id = " + requestId + " не найден."));
+        }
+        Item item = ItemMapper.toItem(itemDto, user, itemRequest);
         item.setOwner(user);
         item = itemRepository.save(item);
         return ItemMapper.toItemShortDto(item);
@@ -78,11 +91,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getUserItems(long userId) {
+    public List<ItemDto> getUserItems(long userId, int from, int size) {
         findUserIfExists(userId);
-        List<Item> foundItems = itemRepository.findByOwner_Id(userId);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<Item> foundItems = itemRepository.findByOwner_Id(userId, page);
         List<Long> itemIds = foundItems.stream()
-                .map(i -> i.getId())
+                .map(Item::getId)
                 .collect(toList());
 
         List<Comment> comments = commentRepository.findByItem_IdIn(itemIds);
@@ -104,10 +118,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemShortDto> searchItems(long userId, String text) {
+    public List<ItemShortDto> searchItems(long userId, String text, int from, int size) {
         findUserIfExists(userId);
         if (text.isBlank()) return new ArrayList<>();
-        List<Item> foundItems = itemRepository.findItemsByText(text);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<Item> foundItems = itemRepository.findItemsByText(text, page);
         return ItemMapper.toItemShortDtoList(foundItems);
     }
 
@@ -119,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
                 LocalDateTime.now());
         if (itemBookings.isEmpty()) {
             throw new ValidationException("Отзыв может оставить только тот пользователь, " +
-                    "который брал эту вещь в аренду, и только после окончания срока аренды");
+                    "который брал эту вещь в аренду, и только после окончания срока аренды.");
         }
         Comment comment = commentRepository.save(CommentMapper.toComment(commentDto, user, item));
         return CommentMapper.toCommentDto(comment);
