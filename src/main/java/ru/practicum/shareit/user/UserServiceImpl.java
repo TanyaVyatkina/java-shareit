@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с заданным id не найден;"));
+                .orElseThrow(() -> new NotFoundException("Пользователь с заданным id не найден."));
         return UserMapper.toUserDto(user);
     }
 
@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-        User userToUpdate = findUserIfExists(id);
+        User userToUpdate = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
         if (userDto.getName() != null) {
             userToUpdate.setName(userDto.getName());
         }
@@ -53,8 +54,4 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    private User findUserIfExists(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден."));
-    }
 }
