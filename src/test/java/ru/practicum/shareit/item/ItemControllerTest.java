@@ -13,7 +13,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemShortDto;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -124,8 +123,7 @@ public class ItemControllerTest {
 
     @Test
     public void addComment() throws Exception {
-        CommentDto commentDto = new CommentDto(11L, "Играет как по нотам", "Валера",
-                LocalDateTime.now());
+        CommentDto commentDto = new CommentDto(11L, "Играет как по нотам", "Валера", null);
         when(itemService.addComment(anyLong(), anyLong(), any()))
                 .thenReturn(commentDto);
 
@@ -139,7 +137,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
                 .andExpect(jsonPath("$.text", is(commentDto.getText())))
                 .andExpect(jsonPath("$.authorName", is(commentDto.getAuthorName())))
-                .andExpect(jsonPath("$.created", is(commentDto.getCreated().toString())));
+                .andExpect(jsonPath("$.created", is(commentDto.getCreated().toString()), String.class));
     }
 
     private ItemDto createItemDto() {
