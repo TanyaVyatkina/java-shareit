@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestServiceImplTest {
@@ -32,13 +32,22 @@ public class ItemRequestServiceImplTest {
     private ItemRequestRepository itemRequestRepository;
 
     @Test
-    void testAddRequestWith_WrongUser() {
+    void testAddRequest_WithWrongUser() {
         ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         NotFoundException result = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addRequest(1L, new ItemRequestShortDto(1L, "Description",
                         LocalDateTime.now())));
         assertEquals(result.getMessage(), "Пользователь с id = 1 не найден.");
+    }
+
+    @Test
+    void testAddRequest() {
+        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+        when(itemRequestRepository.save(any())).thenReturn(new ItemRequest());
+        itemRequestService.addRequest(1L, new ItemRequestShortDto(null, "Description", null));
+        verify(itemRequestRepository, times(1)).save(any());
     }
 
     @Test
@@ -109,5 +118,21 @@ public class ItemRequestServiceImplTest {
         assertEquals(resultItem.getDescription(), item.getDescription());
         assertEquals(resultItem.getAvailable(), item.getAvailable());
         assertEquals(resultItem.getRequestId(), item.getItemRequest().getId());
+    }
+
+    @Test
+    void testGetOtherItemRequests() {
+        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setId(1L);
+        itemRequest.setDescription("Ищу канистру");
+        itemRequest.setCreated(LocalDateTime.of(2023, 12, 20, 12, 12));
+        when(itemRequestRepository.findByRequestor_IdNot(anyLong(), any())).thenReturn(List.of(itemRequest));
+
+        List<ItemRequestDto> resultRequests = itemRequestService.getOtherItemRequests(1L, 0, 3);
+
+        assertEquals(1, resultRequests.size());
+        assertEquals(itemRequest.getCreated(), resultRequests.get(0).getCreated());
     }
 }

@@ -26,7 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceImplTest {
@@ -179,6 +179,50 @@ public class ItemServiceImplTest {
                         "Name", LocalDateTime.now())));
         assertEquals(result.getMessage(), "Отзыв может оставить только тот пользователь, " +
                 "который брал эту вещь в аренду, и только после окончания срока аренды.");
+    }
+
+    @Test
+    void testUpdateItem_ItemNotFound() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
+                itemRequestRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        when(itemRepository.findByIdAndOwner_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
+
+        NotFoundException result = assertThrows(NotFoundException.class,
+                () -> itemService.updateItem(1L, 1L, itemShortDto));
+        assertEquals(result.getMessage(), "Данная вещь для указанного пользователя не найдена.");
+    }
+
+    @Test
+    void testUpdateItem_ItemUpdated() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
+                itemRequestRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        Item item = createItemWithUser();
+        when(itemRepository.findByIdAndOwner_Id(anyLong(), anyLong())).thenReturn(Optional.of(item));
+        itemService.updateItem(1L, 1L, itemShortDto);
+        verify(itemRepository, times(1)).save(item);
+    }
+
+    @Test
+    void testSearchItems_TextIsBlank() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
+                itemRequestRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        List<ItemShortDto> resultItems = itemService.searchItems(1L, "", 0, 1);
+        assertTrue(resultItems.isEmpty());
+    }
+
+    @Test
+    void testSearchItems_FoundItems() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
+                itemRequestRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        Item item = createItemWithUser();
+        when(itemRepository.findItemsByText(anyString(), any())).thenReturn(List.of(item));
+        List<ItemShortDto> resultItems = itemService.searchItems(1L, "text", 0, 1);
+        assertEquals(1, resultItems.size());
+        assertEquals(item.getId(), resultItems.get(0).getId());
     }
 
     private Item createItemWithUser() {
