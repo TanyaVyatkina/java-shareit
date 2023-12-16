@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -41,14 +42,19 @@ public class ItemServiceImplTest {
     private CommentRepository commentRepository;
     @Mock
     private ItemRequestRepository itemRequestRepository;
-    User user = createUser();
-    ItemShortDto itemShortDto = new ItemShortDto(1L, "Барабан",
+    private ItemService itemService;
+    private User user = createUser();
+    private ItemShortDto itemShortDto = new ItemShortDto(1L, "Барабан",
             "Отлично играет", true, 1L, null);
+
+    @BeforeEach
+    void initItemService() {
+        itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
+                itemRequestRepository);
+    }
 
     @Test
     void testAddItem_WithWrongUser() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         NotFoundException result = assertThrows(NotFoundException.class,
                 () -> itemService.addItem(1L, itemShortDto));
@@ -57,8 +63,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testAddItem_WithWrongItemRequest() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         itemShortDto.setRequestId(1111L);
         NotFoundException result = assertThrows(NotFoundException.class,
@@ -67,9 +71,17 @@ public class ItemServiceImplTest {
     }
 
     @Test
+    void testAddItem() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        ItemShortDto dto = new ItemShortDto(null, "Лопата",
+                "Не ржавая", true, 1L, null);
+        when(itemRepository.save(any())).thenReturn(createItemWithUser());
+        itemService.addItem(1L, itemShortDto);
+        verify(itemRepository, times(1)).save(any());
+    }
+
+    @Test
     void testGetItem_WithComment() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Item item = createItemWithUser();
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -95,8 +107,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testGetItem_ByOwner() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Item item = createItemWithUser();
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -138,8 +148,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testGetItem_ByNotOwner() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         User newUser = new User();
         newUser.setId(111L);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(newUser));
@@ -168,8 +176,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testAddComment_WithoutBooking() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(createItemWithUser()));
         when(bookingRepository.findByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any()))
@@ -183,8 +189,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testUpdateItem_ItemNotFound() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         when(itemRepository.findByIdAndOwner_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
 
@@ -195,8 +199,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testUpdateItem_ItemUpdated() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         Item item = createItemWithUser();
         when(itemRepository.findByIdAndOwner_Id(anyLong(), anyLong())).thenReturn(Optional.of(item));
@@ -206,8 +208,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testSearchItems_TextIsBlank() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         List<ItemShortDto> resultItems = itemService.searchItems(1L, "", 0, 1);
         assertTrue(resultItems.isEmpty());
@@ -215,8 +215,6 @@ public class ItemServiceImplTest {
 
     @Test
     void testSearchItems_FoundItems() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository,
-                itemRequestRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         Item item = createItemWithUser();
         when(itemRepository.findItemsByText(anyString(), any())).thenReturn(List.of(item));

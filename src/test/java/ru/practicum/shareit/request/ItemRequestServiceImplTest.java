@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,9 +32,15 @@ public class ItemRequestServiceImplTest {
     @Mock
     private ItemRequestRepository itemRequestRepository;
 
+    private ItemRequestService itemRequestService;
+
+    @BeforeEach
+    void initItemRequestService() {
+        itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
+    }
+
     @Test
     void testAddRequest_WithWrongUser() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         NotFoundException result = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addRequest(1L, new ItemRequestShortDto(1L, "Description",
@@ -43,7 +50,6 @@ public class ItemRequestServiceImplTest {
 
     @Test
     void testAddRequest() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
         when(itemRequestRepository.save(any())).thenReturn(new ItemRequest());
         itemRequestService.addRequest(1L, new ItemRequestShortDto(null, "Description", null));
@@ -52,7 +58,6 @@ public class ItemRequestServiceImplTest {
 
     @Test
     void testGetItemRequest_WithWrongId() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
         when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
         NotFoundException result = assertThrows(NotFoundException.class,
@@ -62,7 +67,6 @@ public class ItemRequestServiceImplTest {
 
     @Test
     void testGetItemRequest_WithoutItem() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
         User requestor = new User();
@@ -84,7 +88,6 @@ public class ItemRequestServiceImplTest {
 
     @Test
     void testGetItemRequest_WithItem() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
         User requestor = new User();
@@ -122,7 +125,6 @@ public class ItemRequestServiceImplTest {
 
     @Test
     void testGetOtherItemRequests() {
-        ItemRequestService itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1L);
