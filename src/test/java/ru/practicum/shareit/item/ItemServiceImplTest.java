@@ -189,6 +189,19 @@ public class ItemServiceImplTest {
     }
 
     @Test
+    void testAddComment() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(createItemWithUser()));
+        when(bookingRepository.findByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any()))
+                .thenReturn(List.of(new Booking()));
+        Comment comment = new Comment();
+        comment.setAuthor(new User());
+        when(commentRepository.save(any())).thenReturn(comment);
+        itemService.addComment(1L, 1l, new CommentDto(null, "text", "author", null));
+        verify(commentRepository, times(1)).save(any());
+    }
+
+    @Test
     void testUpdateItem_ItemNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         when(itemRepository.findByIdAndOwner_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
