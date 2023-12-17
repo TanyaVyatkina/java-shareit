@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -66,7 +67,7 @@ public class BookingServiceImpIntegrationTest {
 
     @Test
     void testGetUserBookings() {
-        List<BookingDto> resultBookings = bookingService.getUserBookings(booker.getId(), BookingState.ALL, 0, 1);
+        List<BookingDto> resultBookings = bookingService.getUserBookings(booker.getId(), BookingState.ALL, PageRequest.of(0,10));
 
         assertEquals(resultBookings.size(), 1);
         BookingDto result = resultBookings.get(0);

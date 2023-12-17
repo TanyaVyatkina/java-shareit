@@ -2,6 +2,8 @@ package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -45,7 +47,9 @@ public class ItemRequestController {
                                                     @RequestParam(defaultValue = "0") @Min(0) int from,
                                                     @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Поиск всех запросов.");
-        List<ItemRequestDto> foundRequests = itemRequestService.getOtherItemRequests(userId, from, size);
+        PageRequest page = PageRequest.of(from / size, size)
+                .withSort(Sort.by(Sort.Direction.DESC, "created"));
+        List<ItemRequestDto> foundRequests = itemRequestService.getOtherItemRequests(userId, page);
         log.debug("Найдены запросы: {}.", foundRequests);
         return foundRequests;
     }

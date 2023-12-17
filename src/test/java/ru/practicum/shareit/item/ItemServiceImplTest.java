@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
@@ -209,7 +210,7 @@ public class ItemServiceImplTest {
     @Test
     void testSearchItems_TextIsBlank() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
-        List<ItemShortDto> resultItems = itemService.searchItems(1L, "", 0, 1);
+        List<ItemShortDto> resultItems = itemService.searchItems(1L, "", PageRequest.of(0, 10));
         assertTrue(resultItems.isEmpty());
     }
 
@@ -218,7 +219,7 @@ public class ItemServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(createUser()));
         Item item = createItemWithUser();
         when(itemRepository.findItemsByText(anyString(), any())).thenReturn(List.of(item));
-        List<ItemShortDto> resultItems = itemService.searchItems(1L, "text", 0, 1);
+        List<ItemShortDto> resultItems = itemService.searchItems(1L, "text", PageRequest.of(0, 10));
         assertEquals(1, resultItems.size());
         assertEquals(item.getId(), resultItems.get(0).getId());
     }

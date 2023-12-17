@@ -91,7 +91,7 @@ public class ItemControllerTest {
     @Test
     public void getUserItems() throws Exception {
         ItemDto itemDto = createItemDto();
-        when(itemService.getUserItems(anyLong(), anyInt(), anyInt()))
+        when(itemService.getUserItems(anyLong(), any()))
                 .thenReturn(List.of(itemDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/items")
@@ -107,7 +107,7 @@ public class ItemControllerTest {
 
     @Test
     public void searchItems() throws Exception {
-        when(itemService.searchItems(anyLong(), anyString(), anyInt(), anyInt()))
+        when(itemService.searchItems(anyLong(), anyString(), any()))
                 .thenReturn(List.of(itemShortDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/items/search?text=text")

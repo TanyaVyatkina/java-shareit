@@ -1,8 +1,7 @@
 package ru.practicum.shareit.request;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemMapper;
@@ -25,18 +24,11 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
-    private ItemRequestRepository itemRequestRepository;
-    private UserRepository userRepository;
-    private ItemRepository itemRepository;
-
-    @Autowired
-    public ItemRequestServiceImpl(ItemRequestRepository itemRequestRepository, UserRepository userRepository,
-                                  ItemRepository itemRepository) {
-        this.itemRequestRepository = itemRequestRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
+    private final ItemRequestRepository itemRequestRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public ItemRequestShortDto addRequest(long userId, ItemRequestShortDto requestDto) {
@@ -56,10 +48,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getOtherItemRequests(long userId, int from, int size) {
+    public List<ItemRequestDto> getOtherItemRequests(long userId, PageRequest page) {
         findUserIfExists(userId);
-        PageRequest page = PageRequest.of(from / size, size)
-                .withSort(Sort.by(Sort.Direction.DESC, "created"));
         return getItemRequestsDtoWithItems(itemRequestRepository.findByRequestor_IdNot(userId, page));
     }
 

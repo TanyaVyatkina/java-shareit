@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -57,7 +58,8 @@ public class ItemController {
                                       @RequestParam(defaultValue = "0") @Min(0) int from,
                                       @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Поиск всех вещей пользователя id = {}.", userId);
-        List<ItemDto> foundItems = itemService.getUserItems(userId, from, size);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<ItemDto> foundItems = itemService.getUserItems(userId, page);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
     }
@@ -67,7 +69,8 @@ public class ItemController {
                                           @RequestParam(defaultValue = "0") @Min(0) int from,
                                           @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Поиск вещей по запросу {}.", text);
-        List<ItemShortDto> foundItems = itemService.searchItems(userId, text, from, size);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<ItemShortDto> foundItems = itemService.searchItems(userId, text, page);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
     }

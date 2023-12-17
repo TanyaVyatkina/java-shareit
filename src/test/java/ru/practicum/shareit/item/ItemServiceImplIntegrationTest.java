@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
@@ -48,8 +49,8 @@ public class ItemServiceImplIntegrationTest {
 
     @Test
     void testGetUserItems() {
-        List<ItemDto> resultItems = itemService.getUserItems(owner.getId(), 0, 1);
-        assertEquals(resultItems.size(), 1);
+        List<ItemDto> resultItems = itemService.getUserItems(owner.getId(), PageRequest.of(0,3));
+        assertEquals(1, resultItems.size());
 
         ItemDto result = resultItems.get(0);
         assertEquals(item.getName(), result.getName());

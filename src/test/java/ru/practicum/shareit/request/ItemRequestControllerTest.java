@@ -88,7 +88,7 @@ public class ItemRequestControllerTest {
 
     @Test
     public void getOtherItemRequestsWithoutParametrs() throws Exception {
-        when(itemRequestService.getOtherItemRequests(anyLong(), anyInt(), anyInt()))
+        when(itemRequestService.getOtherItemRequests(anyLong(), any()))
                 .thenReturn(List.of(itemRequestDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/requests/all")
@@ -105,7 +105,7 @@ public class ItemRequestControllerTest {
 
     @Test
     public void getOtherItemRequestsWithParametrs() throws Exception {
-        when(itemRequestService.getOtherItemRequests(anyLong(), anyInt(), anyInt()))
+        when(itemRequestService.getOtherItemRequests(anyLong(), any()))
                 .thenReturn(List.of(itemRequestDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/requests/all?from=0&size=2")

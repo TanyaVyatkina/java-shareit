@@ -104,7 +104,7 @@ public class BookingControllerTest {
 
     @Test
     public void getUserBookingWithNoParameters() throws Exception {
-        when(bookingService.getUserBookings(anyLong(), any(), anyInt(), anyInt()))
+        when(bookingService.getUserBookings(anyLong(), any(), any()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings")
@@ -121,7 +121,7 @@ public class BookingControllerTest {
 
     @Test
     public void getUserBookingWithParameters() throws Exception {
-        when(bookingService.getUserBookings(anyLong(), any(), anyInt(), anyInt()))
+        when(bookingService.getUserBookings(anyLong(), any(), any()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings?state=CURRENT&from=0&size=2")
@@ -138,7 +138,7 @@ public class BookingControllerTest {
 
     @Test
     public void getBookingsForAllUserItemsWithNoParameters() throws Exception {
-        when(bookingService.getBookingsForAllUserItems(anyLong(), any(), anyInt(), anyInt()))
+        when(bookingService.getBookingsForAllUserItems(anyLong(), any(), any()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings/owner")
@@ -155,7 +155,7 @@ public class BookingControllerTest {
 
     @Test
     public void getBookingsForAllUserItemsWithParameters() throws Exception {
-        when(bookingService.getBookingsForAllUserItems(anyLong(), any(), anyInt(), anyInt()))
+        when(bookingService.getBookingsForAllUserItems(anyLong(), any(), any()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings/owner?state=CURRENT&from=0&size=2")

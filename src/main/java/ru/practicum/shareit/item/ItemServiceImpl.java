@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
@@ -26,24 +26,13 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private ItemRepository itemRepository;
-    private UserRepository userRepository;
-    private BookingRepository bookingRepository;
-    private CommentRepository commentRepository;
-
-    private ItemRequestRepository itemRequestRepository;
-
-    @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
-                           BookingRepository bookingRepository, CommentRepository commentRepository,
-                           ItemRequestRepository itemRequestRepository) {
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-        this.bookingRepository = bookingRepository;
-        this.commentRepository = commentRepository;
-        this.itemRequestRepository = itemRequestRepository;
-    }
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemShortDto addItem(long userId, ItemShortDto itemDto) {
@@ -91,9 +80,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getUserItems(long userId, int from, int size) {
+    public List<ItemDto> getUserItems(long userId, PageRequest page) {
         findUserIfExists(userId);
-        PageRequest page = PageRequest.of(from / size, size);
         List<Item> foundItems = itemRepository.findByOwner_Id(userId, page);
         List<Long> itemIds = foundItems.stream()
                 .map(Item::getId)
@@ -118,10 +106,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemShortDto> searchItems(long userId, String text, int from, int size) {
+    public List<ItemShortDto> searchItems(long userId, String text, PageRequest page) {
         findUserIfExists(userId);
         if (text.isBlank()) return new ArrayList<>();
-        PageRequest page = PageRequest.of(from / size, size);
         List<Item> foundItems = itemRepository.findItemsByText(text, page);
         return ItemMapper.toItemShortDtoList(foundItems);
     }

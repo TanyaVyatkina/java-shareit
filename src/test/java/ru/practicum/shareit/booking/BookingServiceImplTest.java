@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.exception.ForbiddenException;
@@ -177,7 +178,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdIn(any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.ALL,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -191,7 +192,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdInAndStartBeforeAndEndAfter(any(), any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.CURRENT,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -205,7 +206,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdInAndEndBefore(any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.PAST,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -219,7 +220,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdInAndStartAfter(any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.FUTURE,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -233,7 +234,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdInAndStatus(any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.REJECTED,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -247,7 +248,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByItem_IdInAndStatus(any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getBookingsForAllUserItems(11L, BookingState.WAITING,
-                0, 3);
+                PageRequest.of(1, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -259,7 +260,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_IdAndStartBeforeAndEndAfter(anyLong(), any(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.CURRENT,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -271,7 +272,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_IdAndEndBefore(anyLong(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.PAST,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -283,7 +284,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_IdAndStartAfter(anyLong(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.FUTURE,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -295,7 +296,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_IdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.REJECTED,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -307,7 +308,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_IdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.WAITING,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }
@@ -319,7 +320,7 @@ public class BookingServiceImplTest {
         when(bookingRepository.findByBooker_Id(anyLong(), any())).thenReturn(List.of(booking));
 
         List<BookingDto> resultBookings = bookingService.getUserBookings(1L, BookingState.ALL,
-                0, 3);
+                PageRequest.of(0, 10));
         assertEquals(1, resultBookings.size());
         assertEquals(booking.getId(), resultBookings.get(0).getId());
     }

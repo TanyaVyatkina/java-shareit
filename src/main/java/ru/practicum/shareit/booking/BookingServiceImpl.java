@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,17 +20,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private BookingRepository bookingRepository;
-    private UserRepository userRepository;
-    private ItemRepository itemRepository;
-
-    @Autowired
-    public BookingServiceImpl(BookingRepository bookingRepository, UserRepository userRepository, ItemRepository itemRepository) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public BookingDto addBooking(Long userId, BookingRequestDto bookingDto) {
@@ -79,13 +73,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getUserBookings(long userId, BookingState state, int from, int size) {
+    public List<BookingDto> getUserBookings(long userId, BookingState state, PageRequest page) {
         findUserIfExists(userId);
         List<Booking> foundBookings = null;
-        PageRequest page = PageRequest.of(from / size, size).withSort(Sort.Direction.DESC, "id");
         switch (state) {
             case CURRENT:
-                page = page.withSort(Sort.by(Sort.Direction.ASC, "id"));
                 foundBookings = bookingRepository.findByBooker_IdAndStartBeforeAndEndAfter(userId,
                         LocalDateTime.now(), LocalDateTime.now(), page);
                 break;
@@ -110,7 +102,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingsForAllUserItems(long userId, BookingState state, int from, int size) {
+    public List<BookingDto> getBookingsForAllUserItems(long userId, BookingState state, PageRequest page) {
         findUserIfExists(userId);
         List<Item> userItems = itemRepository.findByOwner_Id(userId);
         if (userItems.isEmpty()) return Collections.emptyList();
@@ -120,7 +112,6 @@ public class BookingServiceImpl implements BookingService {
                 .map(Item::getId)
                 .collect(Collectors.toList());
         List<Booking> foundBookings = null;
-        PageRequest page = PageRequest.of(from / size, size).withSort(Sort.Direction.DESC, "id");
         switch (state) {
             case CURRENT:
                 foundBookings = bookingRepository.findByItem_IdInAndStartBeforeAndEndAfter(itemIds,

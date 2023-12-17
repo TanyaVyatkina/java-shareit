@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemShortDto;
@@ -132,7 +133,7 @@ public class ItemRequestServiceImplTest {
         itemRequest.setCreated(LocalDateTime.of(2023, 12, 20, 12, 12));
         when(itemRequestRepository.findByRequestor_IdNot(anyLong(), any())).thenReturn(List.of(itemRequest));
 
-        List<ItemRequestDto> resultRequests = itemRequestService.getOtherItemRequests(1L, 0, 3);
+        List<ItemRequestDto> resultRequests = itemRequestService.getOtherItemRequests(1L, PageRequest.of(1, 10));
 
         assertEquals(1, resultRequests.size());
         assertEquals(itemRequest.getCreated(), resultRequests.get(0).getCreated());
