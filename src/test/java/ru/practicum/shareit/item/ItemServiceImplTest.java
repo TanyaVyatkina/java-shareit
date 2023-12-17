@@ -197,7 +197,7 @@ public class ItemServiceImplTest {
         Comment comment = new Comment();
         comment.setAuthor(new User());
         when(commentRepository.save(any())).thenReturn(comment);
-        itemService.addComment(1L, 1l, new CommentDto(null, "text", "author", null));
+        itemService.addComment(1L, 1L, new CommentDto(null, "text", "author", null));
         verify(commentRepository, times(1)).save(any());
     }
 
