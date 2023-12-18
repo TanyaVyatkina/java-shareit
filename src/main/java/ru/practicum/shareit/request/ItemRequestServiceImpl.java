@@ -34,7 +34,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestShortDto addRequest(long userId, ItemRequestShortDto requestDto) {
         User user = findUserIfExists(userId);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(requestDto, user);
-        itemRequest.setCreated(LocalDateTime.now());
         itemRequest = itemRequestRepository.save(itemRequest);
         return ItemRequestMapper.toItemRequestShortDto(itemRequest);
     }

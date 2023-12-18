@@ -19,4 +19,8 @@ public class ItemRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     private User requestor;
     private LocalDateTime created;
+
+    public ItemRequest() {
+        created = LocalDateTime.now();
+    }
 }
