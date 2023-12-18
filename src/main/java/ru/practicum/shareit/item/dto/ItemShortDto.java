@@ -24,4 +24,5 @@ public class ItemShortDto {
     @NotNull(groups = OnCreate.class)
     private Boolean available;
     private Long ownerId;
+    private Long requestId;
 }

@@ -8,16 +8,19 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemForBookingDto;
 import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ItemMapper {
     public static ItemShortDto toItemShortDto(Item item) {
+        Long requestId = item.getItemRequest() == null ? null : item.getItemRequest().getId();
         return new ItemShortDto(item.getId(), item.getName(), item.getDescription(),
-                item.getAvailable(), item.getOwner().getId());
+                item.getAvailable(), item.getOwner().getId(), requestId);
     }
 
     public static ItemDto toItemDto(Item item, List<CommentDto> comments, List<Booking> bookingsForItem) {
@@ -44,18 +47,20 @@ public class ItemMapper {
     }
 
     public static List<ItemShortDto> toItemShortDtoList(List<Item> items) {
+        if (items == null) return Collections.emptyList();
         return items.stream()
                 .map(ItemMapper::toItemShortDto)
                 .collect(Collectors.toList());
     }
 
-    public static Item toItem(ItemShortDto itemDto, User owner) {
+    public static Item toItem(ItemShortDto itemDto, User owner, ItemRequest itemRequest) {
         Item item = new Item();
         item.setOwner(owner);
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
         item.setId(item.getId());
+        item.setItemRequest(itemRequest);
         return item;
     }
 

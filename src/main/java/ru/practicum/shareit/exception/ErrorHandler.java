@@ -37,13 +37,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictEmailException(final ConflictException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleForbiddenException(final ForbiddenException e) {
         log.error(e.getMessage());

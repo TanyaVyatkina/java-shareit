@@ -2,16 +2,21 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
+@Validated
 @Slf4j
 public class BookingController {
     private BookingService bookingService;
@@ -57,10 +62,13 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") int userId,
-                                            @RequestParam(defaultValue = "ALL") String state) {
+                                            @RequestParam(defaultValue = "ALL") String state,
+                                            @RequestParam(defaultValue = "0") @Min(0) int from,
+                                            @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Получение списка всех бронирований пользователя (id = {}).", userId);
         BookingState stateEnum = BookingState.toEnum(state);
-        List<BookingDto> foundBookings = bookingService.getUserBookings(userId, stateEnum);
+        PageRequest page = PageRequest.of(from / size, size).withSort(Sort.Direction.DESC, "start");
+        List<BookingDto> foundBookings = bookingService.getUserBookings(userId, stateEnum, page);
         log.debug("Найдены бронирования: {}.", foundBookings);
         BookingState.ALL.name();
         return foundBookings;
@@ -68,17 +76,14 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsForAllUserItems(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                       @RequestParam(defaultValue = "ALL") String state) {
+                                                       @RequestParam(defaultValue = "ALL") String state,
+                                                       @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                       @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Получение списка бронирований для всех вещей пользователя (id = {}).", userId);
-        BookingState stateEnum;
-        try {
-            stateEnum = BookingState.valueOf(state);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException("Unknown state: " + state);
-        }
-        List<BookingDto> foundBookings = bookingService.getBookingsForAllUserItems(userId, stateEnum);
+        BookingState stateEnum = BookingState.toEnum(state);
+        PageRequest page = PageRequest.of(from / size, size).withSort(Sort.Direction.DESC, "start");
+        List<BookingDto> foundBookings = bookingService.getBookingsForAllUserItems(userId, stateEnum, page);
         log.debug("Найдены бронирования: {}.", foundBookings);
-        BookingState.ALL.name();
         return foundBookings;
     }
 }

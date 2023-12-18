@@ -18,7 +18,6 @@ ItemDto {
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
     private List<CommentDto> comments;
-    // private ItemRequest request;
 
     public ItemDto(Long id, String name, String description, Boolean available, Long ownerId, List<CommentDto> comments) {
         this.id = id;

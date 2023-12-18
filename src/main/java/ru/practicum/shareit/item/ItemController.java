@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.validator.OnCreate;
 import ru.practicum.shareit.validator.OnUpdate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -26,7 +28,8 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemShortDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody @Validated({OnCreate.class}) ItemShortDto item) {
+    public ItemShortDto addItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                @RequestBody @Validated({OnCreate.class}) ItemShortDto item) {
         log.debug("Добавление вещи {} пользователя с id = {}.", item.getName(), userId);
         ItemShortDto savedItem = itemService.addItem(userId, item);
         log.debug("Вещь добавлена.");
@@ -51,17 +54,23 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") long userId,
+                                      @RequestParam(defaultValue = "0") @Min(0) int from,
+                                      @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Поиск всех вещей пользователя id = {}.", userId);
-        List<ItemDto> foundItems = itemService.getUserItems(userId);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<ItemDto> foundItems = itemService.getUserItems(userId, page);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
     }
 
     @GetMapping("/search")
-    public List<ItemShortDto> searchItems(@RequestHeader("X-Sharer-User-Id") long userId, @RequestParam String text) {
+    public List<ItemShortDto> searchItems(@RequestHeader("X-Sharer-User-Id") long userId, @RequestParam String text,
+                                          @RequestParam(defaultValue = "0") @Min(0) int from,
+                                          @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Поиск вещей по запросу {}.", text);
-        List<ItemShortDto> foundItems = itemService.searchItems(userId, text);
+        PageRequest page = PageRequest.of(from / size, size);
+        List<ItemShortDto> foundItems = itemService.searchItems(userId, text, page);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
     }

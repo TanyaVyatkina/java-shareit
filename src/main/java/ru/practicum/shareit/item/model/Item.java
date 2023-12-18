@@ -2,13 +2,11 @@ package ru.practicum.shareit.item.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Entity
 @Table(name = "items")
 @Getter
@@ -23,7 +21,7 @@ public class Item {
     private Boolean available;
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
-    // @OneToOne(fetch = FetchType.LAZY)
-    //  private ItemRequest request;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ItemRequest itemRequest;
 
 }
