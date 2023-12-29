@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -53,7 +54,7 @@ public class ItemController {
                                       @RequestParam(defaultValue = "0") int from,
                                       @RequestParam(defaultValue = "10") int size) {
         log.debug("Поиск всех вещей пользователя id = {}.", userId);
-        PageRequest page = PageRequest.of(from / size, size);
+        PageRequest page = PageRequest.of(from / size, size).withSort(Sort.Direction.ASC, "id");
         List<ItemDto> foundItems = itemService.getUserItems(userId, page);
         log.debug("Найдены вещи: {}.", foundItems);
         return foundItems;
