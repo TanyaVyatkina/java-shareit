@@ -11,7 +11,7 @@ services:
     - server
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
-      - JAVA_TOOL_OPTIONS = -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   server:
     build: server/
     image: shareit-server
@@ -25,7 +25,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - SPRING_DATASOURCE_USER=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - JAVA_TOOL_OPTIONS = -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 
   db:
     image: postgres:13.7-alpine
