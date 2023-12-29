@@ -36,10 +36,12 @@ public class BookingMapper {
 
     public static Booking toBooking(BookingRequestDto dto, User booker, Item item) {
         Booking booking = new Booking();
+        if (dto.getStatus() != null) {
+            booking.setStatus(dto.getStatus());
+        }
         booking.setBooker(booker);
         booking.setStart(dto.getStart());
         booking.setEnd(dto.getEnd());
-        booking.setStatus(dto.getStatus());
         booking.setItem(item);
         return booking;
     }

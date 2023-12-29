@@ -2,13 +2,12 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.validator.OnCreate;
 import ru.practicum.shareit.validator.OnUpdate;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,32 +19,32 @@ public class UserController {
     private final UserClient userClient;
 
     @GetMapping
-    public List<UserDto> findAll() {
+    public ResponseEntity findAll() {
         log.debug("Поиск всех пользователей.");
-        return (List<UserDto>) userClient.getAllUser().getBody();
+        return userClient.getAllUser();
     }
 
     @GetMapping("/{id}")
-    public UserDto findById(@PathVariable("id") Long id) {
+    public ResponseEntity findById(@PathVariable("id") Long id) {
         log.debug("Поиск пользователя с id = {}.", id);
-        UserDto user = (UserDto) userClient.getUser(id).getBody();
+        ResponseEntity user = userClient.getUser(id);
         log.debug("Найден пользователь {}.", id);
         return user;
     }
 
     @PostMapping
-    public UserDto create(@RequestBody @Validated({OnCreate.class}) UserDto user) {
+    public ResponseEntity create(@RequestBody @Validated({OnCreate.class}) UserDto user) {
         log.debug("Пришел запрос на добавление пользователя.");
-        UserDto createdUser = (UserDto) userClient.saveUser(user).getBody();
-        log.debug("Добавлен пользователь c id = {}", createdUser.getId());
+        ResponseEntity createdUser = userClient.saveUser(user);
+        log.debug("Пользователь добавлен.");
         return createdUser;
 
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody @Validated({OnUpdate.class}) UserDto user) {
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody @Validated({OnUpdate.class}) UserDto user) {
         log.debug("Пришел запрос на обновление пользователя.");
-        UserDto updatedUser = (UserDto) userClient.updateUser(id, user).getBody();
+        ResponseEntity updatedUser = userClient.updateUser(id, user);
         log.debug("Обновлен пользователь с id = {}", user.getId());
         return updatedUser;
     }
