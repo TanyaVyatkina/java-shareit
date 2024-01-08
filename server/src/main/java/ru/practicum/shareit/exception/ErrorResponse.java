@@ -9,6 +9,11 @@ public class ErrorResponse {
         this.stack = stack;
     }
 
+    public ErrorResponse(String error) {
+        this.error = error;
+        stack = null;
+    }
+
     public String getError() {
         return error;
     }

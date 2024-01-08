@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
+import java.util.Optional;
+
 public enum BookingState {
     ALL,
     CURRENT,
@@ -8,13 +10,12 @@ public enum BookingState {
     WAITING,
     REJECTED;
 
-    public static BookingState toEnum(String str) {
-        BookingState state;
-        try {
-            state = BookingState.valueOf(str);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Unknown state: " + str);
+    public static Optional<BookingState> from(String stringState) {
+        for (BookingState state : values()) {
+            if (state.name().equalsIgnoreCase(stringState)) {
+                return Optional.of(state);
+            }
         }
-        return state;
+        return Optional.empty();
     }
 }

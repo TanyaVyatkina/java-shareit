@@ -59,8 +59,9 @@ public class BookingController {
                                           @RequestParam(defaultValue = "0") @Min(0) int from,
                                           @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Получение списка всех бронирований пользователя (id = {}).", userId);
-        BookingState stateEnum = BookingState.toEnum(state);
-        ResponseEntity foundBookings = bookingClient.getBookings("", userId, stateEnum, from, size);
+        BookingState bookingState = BookingState.from(state)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + state));
+        ResponseEntity foundBookings = bookingClient.getBookings("", userId, bookingState, from, size);
         log.debug("Найдены бронирования: {}.", foundBookings.getBody());
         return foundBookings;
     }
@@ -71,8 +72,9 @@ public class BookingController {
                                                      @RequestParam(defaultValue = "0") @Min(0) int from,
                                                      @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Получение списка бронирований для всех вещей пользователя (id = {}).", userId);
-        BookingState stateEnum = BookingState.toEnum(state);
-        ResponseEntity foundBookings = bookingClient.getBookings("/owner", userId, stateEnum, from, size);
+        BookingState bookingState = BookingState.from(state)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + state));
+        ResponseEntity foundBookings = bookingClient.getBookings("/owner", userId, bookingState, from, size);
         log.debug("Найдены бронирования: {}.", foundBookings.getBody());
         return foundBookings;
     }

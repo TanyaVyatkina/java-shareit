@@ -16,14 +16,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
         log.error("Ошибка валидации: {}", e.getMessage());
-        return new ErrorResponse("Ошибка валидации: " + e.getMessage(), e.getStackTrace().toString());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
+        return new ErrorResponse("Ошибка валидации: " + e.getMessage());
     }
 
     @ExceptionHandler
@@ -34,13 +27,6 @@ public class ErrorHandler {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         return new ErrorResponse(e.getMessage(), sw.toString());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleForbiddenException(final ForbiddenException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), e.getStackTrace().toString());
     }
 }
 

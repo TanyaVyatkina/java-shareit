@@ -8,8 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class
-ItemDto {
+public class ItemDto {
     private Long id;
     private String name;
     private String description;
